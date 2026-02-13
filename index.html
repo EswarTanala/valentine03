@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>For You ❤️</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      max-width: 400px;
+    }
+
+    h1 { color:#ff4d6d; }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+    }
+
+    #yes { background:#ff4d6d; color:white; }
+    #no { background:#888; color:white; }
+
+    .hidden { display:none; }
+
+    /* typing */
+    #typing {
+      font-size: 20px;
+      color:#ff4d6d;
+      min-height: 50px;
+    }
+
+/* ⭐ final photo grid */
+.final-gallery{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.final-gallery img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+    /* hearts */
+    .heart {
+      position: fixed;
+      animation: float 4s linear infinite;
+      pointer-events:none;
+    }
+
+    @keyframes float {
+      from { transform:translateY(100vh); opacity:1;}
+      to { transform:translateY(-10vh); opacity:0;}
+    }
+
+    /* gallery */
+   /* ⭐ SLIDER GALLERY */
+/* ❤️ FADE GALLERY */
+/* ❤️ PERFECT PORTRAIT GALLERY */
+.gallery{
+  width:100%;
+  height:420px;          /* fixed tall box */
+  margin:15px auto;
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.gallery img {
+  position: absolute;
+  top: 0;      /* Add this */
+  left: 0;     /* Add this */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.gallery img.active{
+  opacity:1;
+}
+
+    /* reason cards */
+    .reason {
+      background:#ffe5ec;
+      padding:5px;
+      border-radius:10px;
+      margin:8px 0;
+    }
+
+/* Mobile Optimization */
+@media (max-width: 600px) {
+  .card {
+    width: 90%;       /* Use most of the screen width */
+    padding: 20px;    /* Reduce padding so it doesn't feel cramped */
+  }
+
+  h1 {
+    font-size: 22px;  /* Make text a bit smaller to fit on one line */
+  }
+
+  .gallery {
+    height: 350px;    /* Slightly shorter gallery for mobile screens */
+  }
+
+  #typing {
+    font-size: 18px;  /* Easier to read on mobile */
+  }
+}
+  </style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+
+  <!-- TYPING INTRO -->
+  <div id="typing"></div>
+  <button id="startBtn">Click for surprise 💌</button>
+
+</div>
+
+
+<!-- background music (replace with your song link) -->
+<audio id="music" src="music.mp3" loop></audio>
+
+
+<script>
+
+const card = document.getElementById("card");
+const typing = document.getElementById("typing");
+const startBtn = document.getElementById("startBtn");
+const music = document.getElementById("music");
+
+const herName = "My Likhii";  // ⭐ change name
+
+
+/* ---------------- TYPING INTRO ---------------- */
+
+const text = `Hey ${herName}...\nI made something special for you 😊`;
+let i = 0;
+
+function typeWriter(){
+  if(i < text.length){
+    typing.innerHTML += text.charAt(i);
+    i++;
+    setTimeout(typeWriter, 40);
+  }
+}
+
+typeWriter();
+
+
+startBtn.onclick = () => {
+  showQuestion();
+};
+
+
+/* ---------------- QUESTION PAGE ---------------- */
+
+function showQuestion(){
+  card.innerHTML = `
+    <h1>Will you be my Valentine? 💖</h1>
+    <button id="yes">Yes 💕</button>
+    <button id="no">No 💔</button>
+  `;
+
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+
+  let yesSize = 1;
+
+  function moveNo(){
+    no.style.position="fixed";
+    no.style.left=Math.random()*80+"vw";
+    no.style.top=Math.random()*80+"vh";
+
+    yesSize += 0.2;  // YES grows bigger 😈
+    yes.style.transform=`scale(${yesSize})`;
+  }
+
+  no.addEventListener("mouseenter", moveNo);
+  no.addEventListener("click", (e)=>{e.preventDefault(); moveNo();});
+
+  yes.onclick = ()=>{
+    music.play();
+    showGallery();
+    createHearts();
+  }
+}
+
+
+/* ---------------- PHOTO GALLERY ---------------- */
+
+function showGallery(){
+
+card.innerHTML = `
+  <h1>Some smiles because of you ❤️</h1>
+
+  <div class="gallery" >
+    <img src="photo2.jpeg" class="active">
+    <img src="photo3.jpeg">
+    <img src="photo4.jpeg">
+    <img src="photo1.jpeg">
+  </div>
+  <button id="nextBtn" style="display:none;">Next ➜</button>
+`;
+
+startFade();
+}
+
+function startFade(){
+  const slides = document.querySelectorAll(".gallery img");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let index = 0;
+  const total = slides.length;
+
+  // Show the "Next" button immediately or after a short delay 
+  // so she can move on whenever she's ready
+  setTimeout(() => {
+    nextBtn.style.display = "inline-block";
+  }, 5000); 
+
+  setInterval(() => {
+    // 1. Hide the current image
+    slides[index].classList.remove("active");
+
+    // 2. Move to the next index
+    index++;
+
+    // 3. IF we hit the end, reset to 0 to LOOP forever
+    if(index >= total){
+      index = 0;
+    }
+
+    // 4. Show the new image
+    slides[index].classList.add("active");
+
+  }, 2500);
+
+  nextBtn.onclick = showReasons;
+}/* ---------------- REASONS ---------------- */
+
+function showReasons(){
+  card.innerHTML = `
+    <h1>Why I like you 💕</h1>
+    <div class="reason">You are the only one staying with me from a long time</div>
+    <div class="reason">May be it shows how close we are</div>
+    <div class="reason">We can make this to another step</div>
+    <div class="reason">May be something that we both likes...</div>
+    <button onclick="finalMessage()">Last words ➜</button>
+  `;
+}
+
+
+/* ---------------- FINAL MESSAGE ---------------- */
+
+function finalMessage(){
+  card.innerHTML = `
+    <h1>One last thing…</h1>
+    <p>
+      Even though we're far apart,<br>
+      you became really special to me ❤️<br><br>
+      Just give me one chance ammaiii.... <br><br>I will show you the peak of love<br><br>
+      Happy Valentine’s Day, ${herName} 🌸
+    </p>
+<div class="final-gallery">
+      <img src="photo6.jpg">
+      <img src="photo7.jpg">
+      <img src="photo8.jpg">
+      <img src="photo9.jpg">
+    </div>
+  `;
+}
+  `;
+}
+
+
+/* ---------------- HEARTS ---------------- */
+
+function createHearts(){
+  setInterval(()=>{
+    const h = document.createElement("div");
+    h.className="heart";
+    h.innerHTML="❤️";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(Math.random()*20+15)+"px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),4000);
+  },300);
+}
+
+</script>
+
+</body>
+</html>
